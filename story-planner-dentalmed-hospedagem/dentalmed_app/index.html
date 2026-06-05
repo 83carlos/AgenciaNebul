@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Story Planner DentalMed</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2f3192" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <img src="assets/logo.png" alt="DentalMed" class="logo" />
+    <div>
+      <h1>Story Planner</h1>
+      <p>Calendário de stories • 08/06 a 13/06</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="dashboard">
+      <div class="stat"><strong id="totalTasks">0</strong><span>Total</span></div>
+      <div class="stat"><strong id="doneTasks">0</strong><span>Concluídas</span></div>
+      <div class="stat"><strong id="pendingTasks">0</strong><span>Pendentes</span></div>
+    </section>
+
+    <section class="filters">
+      <select id="statusFilter">
+        <option value="all">Todos os status</option>
+        <option value="pending">Pendentes</option>
+        <option value="done">Concluídas</option>
+      </select>
+      <select id="shiftFilter">
+        <option value="all">Todos os turnos</option>
+        <option value="Manhã">Manhã</option>
+        <option value="Tarde">Tarde</option>
+      </select>
+    </section>
+
+    <section id="calendar" class="calendar"></section>
+
+    <section class="ideas">
+      <h2>Ideias rápidas</h2>
+      <div class="idea-card">CTA: “Passe na loja e conheça de perto.”</div>
+      <div class="idea-card">Enquete: “Você já usou esse material?”</div>
+      <div class="idea-card">Pergunta: “Qual produto você quer ver por aqui?”</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>DentalMed • Gestão de stories</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
