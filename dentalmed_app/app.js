@@ -18,6 +18,12 @@ const runtimeSupabaseUrl = localStorage.getItem('dentalmedSupabaseUrl') || confi
 const runtimeSupabaseAnonKey = localStorage.getItem('dentalmedSupabaseAnonKey') || config.SUPABASE_ANON_KEY;
 const hasSupabase = Boolean(runtimeSupabaseUrl && runtimeSupabaseAnonKey && window.supabase);
 const db = hasSupabase ? window.supabase.createClient(runtimeSupabaseUrl, runtimeSupabaseAnonKey) : null;
+const SHEET_URL_FALLBACKS = [
+  {
+    publishedId: '2PACX-1vTrJ_5S2enTouOcwTKwFxjm59yTT81BMy4WZWXB6jN3W_fsv3RzbEEvTh_psk9arI0sEeK0e_fQHpuv',
+    csvUrl: 'https://docs.google.com/spreadsheets/d/1vskvZpzR9rU8LeFx4T-8OqYvqe0oeqxxjZTH8bCUeeI/gviz/tq?tqx=out:csv&gid=1423022280'
+  }
+];
 
 const state = {
   session: null,
@@ -51,7 +57,11 @@ function todayMonth() {
 }
 
 function normalizeSheetCsvUrl(value) {
-  const url = String(value || '').trim();
+  const rawUrl = String(value || '').trim();
+  const markdownUrl = rawUrl.match(/\((https?:\/\/[^)]+)\)/)?.[1] || rawUrl.match(/\[(https?:\/\/[^\]]+)\]/)?.[1];
+  const url = markdownUrl || rawUrl;
+  const fallback = SHEET_URL_FALLBACKS.find(item => url.includes(item.publishedId));
+  if (fallback) return fallback.csvUrl;
   if (url.includes('/pub?') && url.includes('output=csv')) return url;
   if (url.includes('/gviz/tq')) return url;
   const match = url.match(/docs\.google\.com\/spreadsheets\/d\/([^/]+)/);
@@ -705,6 +715,11 @@ async function saveTask(taskId, status) {
 function saveCsvUrl() {
   const input = document.querySelector('[data-action="csv-url"]');
   state.csvUrl = normalizeSheetCsvUrl(input?.value || '');
+  if (!state.csvUrl) {
+    state.error = 'Informe a URL do CSV publicado ou o link compartilhado da planilha.';
+    renderApp();
+    return;
+  }
   localStorage.setItem('dentalmedCsvUrl', state.csvUrl);
   state.notice = 'URL da planilha salva neste navegador.';
   renderApp();
@@ -741,7 +756,9 @@ async function syncCsv() {
 
   try {
     const response = await fetch(state.csvUrl);
-    if (!response.ok) throw new Error('Nao foi possivel baixar a planilha.');
+    if (!response.ok) {
+      throw new Error(`Nao foi possivel baixar a planilha. O Google respondeu ${response.status}. Confira se a planilha esta publicada ou use o link compartilhado original.`);
+    }
     const rows = parseCsv(await response.text());
     const payload = rows.map(csvRowToTask).filter(Boolean);
     if (!payload.length) throw new Error('Nenhuma tarefa valida encontrada no CSV.');
