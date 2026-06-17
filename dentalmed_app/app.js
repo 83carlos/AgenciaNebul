@@ -33,7 +33,7 @@ const state = {
   statusFilter: 'all',
   monthFilter: new Date().toISOString().slice(0, 7),
   reportUnitFilter: 'all',
-  csvUrl: config.GOOGLE_SHEETS_CSV_URL || localStorage.getItem('dentalmedCsvUrl') || '',
+  csvUrl: normalizeSheetCsvUrl(localStorage.getItem('dentalmedCsvUrl') || config.GOOGLE_SHEETS_CSV_URL || ''),
   notice: '',
   error: ''
 };
@@ -48,6 +48,14 @@ function normalize(value) {
 
 function todayMonth() {
   return new Date().toISOString().slice(0, 7);
+}
+
+function normalizeSheetCsvUrl(value) {
+  const url = String(value || '').trim();
+  const match = url.match(/docs\.google\.com\/spreadsheets\/d\/([^/]+)/);
+  if (!match) return url;
+  const gid = url.match(/[?&]gid=(\d+)/)?.[1] || '0';
+  return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
 }
 
 function isAdmin() {
@@ -693,7 +701,7 @@ async function saveTask(taskId, status) {
 
 function saveCsvUrl() {
   const input = document.querySelector('[data-action="csv-url"]');
-  state.csvUrl = input?.value.trim() || '';
+  state.csvUrl = normalizeSheetCsvUrl(input?.value || '');
   localStorage.setItem('dentalmedCsvUrl', state.csvUrl);
   state.notice = 'URL da planilha salva neste navegador.';
   renderApp();

@@ -107,6 +107,16 @@ Um modelo pronto esta em `docs/google-sheets-template.csv`. Para usar:
 4. Escolha a aba da planilha e o formato **CSV**.
 5. Copie a URL publicada e use no campo `GOOGLE_SHEETS_CSV_URL` em `dentalmed_app/config.js`.
 
+Tambem e possivel colar um link comum de edicao/compartilhamento do Google Sheets. O app converte links no formato `/edit` para `/export?format=csv&gid=0`, mas a planilha precisa permitir leitura publica ou estar publicada na Web.
+
+## Checklist de conexao
+
+- `dentalmed_app/config.js` preenchido com `SUPABASE_URL`, `SUPABASE_ANON_KEY` e URL da planilha.
+- `supabase/schema.sql` executado no SQL Editor do Supabase.
+- Usuarios criados no Supabase Auth.
+- Perfis correspondentes criados na tabela `public.users`.
+- Google Sheets publicado na Web como CSV ou compartilhado publicamente para leitura.
+
 ## Deploy no Netlify
 
 O arquivo `netlify.toml` ja publica a pasta `dentalmed_app`.
