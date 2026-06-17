@@ -14,8 +14,10 @@ const STATUS_LABELS = {
 
 const app = document.getElementById('app');
 const config = window.DENTALMED_CONFIG || {};
-const hasSupabase = Boolean(config.SUPABASE_URL && config.SUPABASE_ANON_KEY && window.supabase);
-const db = hasSupabase ? window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY) : null;
+const runtimeSupabaseUrl = localStorage.getItem('dentalmedSupabaseUrl') || config.SUPABASE_URL;
+const runtimeSupabaseAnonKey = localStorage.getItem('dentalmedSupabaseAnonKey') || config.SUPABASE_ANON_KEY;
+const hasSupabase = Boolean(runtimeSupabaseUrl && runtimeSupabaseAnonKey && window.supabase);
+const db = hasSupabase ? window.supabase.createClient(runtimeSupabaseUrl, runtimeSupabaseAnonKey) : null;
 
 const state = {
   session: null,
@@ -573,6 +575,20 @@ function renderSync() {
         </div>
       </div>
       <div class="sync-box">
+        <div class="message">
+          ${hasSupabase ? 'Supabase conectado neste navegador.' : 'Supabase ainda nao configurado. Preencha os campos abaixo para testar a conexao.'}
+        </div>
+        <label class="field">
+          <span>SUPABASE_URL</span>
+          <input type="url" value="${escapeHtml(runtimeSupabaseUrl || '')}" data-action="runtime-supabase-url" placeholder="https://seu-projeto.supabase.co" />
+        </label>
+        <label class="field">
+          <span>SUPABASE_ANON_KEY</span>
+          <input type="password" value="${escapeHtml(runtimeSupabaseAnonKey || '')}" data-action="runtime-supabase-key" placeholder="eyJ..." />
+        </label>
+        <div class="actions">
+          <button class="btn ghost" data-action="save-supabase-config" type="button">Salvar Supabase neste navegador</button>
+        </div>
         <label class="field">
           <span>URL CSV publicada</span>
           <input type="url" value="${escapeHtml(state.csvUrl)}" data-action="csv-url" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" />
@@ -622,6 +638,7 @@ function bindEvents() {
   document.querySelector('[data-action="export-csv"]')?.addEventListener('click', exportReportCsv);
   document.querySelector('[data-action="save-csv-url"]')?.addEventListener('click', saveCsvUrl);
   document.querySelector('[data-action="sync-csv"]')?.addEventListener('click', syncCsv);
+  document.querySelector('[data-action="save-supabase-config"]')?.addEventListener('click', saveSupabaseConfig);
 
   document.querySelectorAll('[data-complete-task]').forEach(button => button.addEventListener('click', () => saveTask(button.dataset.completeTask, 'completed')));
   document.querySelectorAll('[data-save-task]').forEach(button => {
@@ -680,6 +697,19 @@ function saveCsvUrl() {
   localStorage.setItem('dentalmedCsvUrl', state.csvUrl);
   state.notice = 'URL da planilha salva neste navegador.';
   renderApp();
+}
+
+function saveSupabaseConfig() {
+  const url = document.querySelector('[data-action="runtime-supabase-url"]')?.value.trim() || '';
+  const key = document.querySelector('[data-action="runtime-supabase-key"]')?.value.trim() || '';
+  if (!url || !key) {
+    state.error = 'Informe SUPABASE_URL e SUPABASE_ANON_KEY.';
+    renderApp();
+    return;
+  }
+  localStorage.setItem('dentalmedSupabaseUrl', url);
+  localStorage.setItem('dentalmedSupabaseAnonKey', key);
+  window.location.reload();
 }
 
 async function syncCsv() {

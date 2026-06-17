@@ -1,0 +1,5 @@
+unidade,data,horario,turno,titulo,descricao,tipo de conteudo,cta,enquete,link de referencia,responsavel,status inicial
+Joao Pessoa,2026-06-22,09:00,Manha,Abertura da loja,Mostrar equipe chegando e loja pronta para receber clientes,Bastidores,Passe na loja para conhecer de perto,,https://exemplo.com/referencia,Responsavel Joao Pessoa,pending
+Campina Grande,2026-06-22,15:00,Tarde,Produto destaque,Mostrar produto premium com close em detalhes,Produto,Chame no WhatsApp para consultar disponibilidade,Voce ja usou esse material?,https://exemplo.com/produto,Responsavel Campina Grande,pending
+Recife,2026-06-23,09:00,Manha,Dica do Academico,Apresentar material bastante usado na graduacao,Educativo,Salve para consultar depois,Esse conteudo ajudou?,https://exemplo.com/dica,Responsavel Recife,pending
+Guarabira,2026-06-23,15:00,Tarde,Favorito da Bancada,Mostrar produto muito procurado pelos dentistas,Produto,Passe na unidade para conhecer,Voce quer ver mais produtos assim?,https://exemplo.com/favorito,Responsavel Guarabira,pending

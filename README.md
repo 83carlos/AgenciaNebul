@@ -99,6 +99,14 @@ Formatos aceitos:
 
 No app, entre como admin, abra **Sincronizar**, informe a URL CSV e clique em **Sincronizar agora**.
 
+Um modelo pronto esta em `docs/google-sheets-template.csv`. Para usar:
+
+1. Importe esse CSV no Google Sheets.
+2. Ajuste as linhas de conteudo.
+3. Acesse **Arquivo > Compartilhar > Publicar na Web**.
+4. Escolha a aba da planilha e o formato **CSV**.
+5. Copie a URL publicada e use no campo `GOOGLE_SHEETS_CSV_URL` em `dentalmed_app/config.js`.
+
 ## Deploy no Netlify
 
 O arquivo `netlify.toml` ja publica a pasta `dentalmed_app`.
