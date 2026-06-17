@@ -1,86 +1,122 @@
-<p align="center">
-  <img src="./assets/logo.png" width="220">
-</p>
+# Story Planner DentalMed
 
-<h1 align="center">Story Planner DentalMed</h1>
+Sistema web para gerenciar o calendario de stories das quatro unidades DentalMed:
 
-<p align="center">
-Organização inteligente para a produção diária de Stories.
-</p>
+- DentalMed Joao Pessoa
+- DentalMed Campina Grande
+- DentalMed Recife
+- DentalMed Guarabira
 
+O projeto evoluiu de um checklist local para um painel multiunidades com login, permissoes, tarefas por unidade, observacoes, logs, relatorios mensais e sincronizacao por CSV publicado do Google Sheets.
 
-# 🦷 Story Planner DentalMed
+## Funcionalidades
 
-Aplicativo web desenvolvido para auxiliar a equipe da DentalMed no gerenciamento do calendário semanal de Stories.
+- Login com Supabase Auth.
+- Perfis `admin` e `responsible`.
+- Responsavel visualiza apenas tarefas da propria unidade.
+- Admin visualiza todas as unidades, relatorios e sincronizacao.
+- Checklist com status `pending`, `in_progress`, `completed` e `not_done`.
+- Logs com usuario, unidade, tarefa, status, observacao e data.
+- Relatorio mensal com total previsto, total concluido, percentual e ranking.
+- Exportacao simples em CSV.
+- Sincronizacao manual por CSV publicado do Google Sheets.
+- Layout responsivo com foco no celular.
 
-## ✨ Funcionalidades
+## Estrutura
 
-- Visualização do planejamento semanal.
-- Separação por dias e turnos (Manhã/Tarde).
-- Checklist de tarefas.
-- Marcação de tarefas concluídas.
-- Campo de observações.
-- Filtros por status.
-- Interface responsiva para celular e computador.
-- Dados salvos localmente no navegador.
-
----
-
-## 🚀 Como utilizar
-
-1. Baixe ou clone este projeto.
-2. Abra o arquivo `index.html` em qualquer navegador.
-
-Ou publique gratuitamente em serviços como:
-
-- Netlify
-- Vercel
-- GitHub Pages
-
----
-
-## 📁 Estrutura do projeto
-
-```
+```text
 /
-├── index.html
-├── style.css
-├── script.js
-├── assets/
-│   └── logo.png
+├── dentalmed_app/
+│   ├── assets/logo.png
+│   ├── app.js
+│   ├── config.example.js
+│   ├── index.html
+│   ├── manifest.json
+│   ├── style.css
+│   └── sw.js
+├── supabase/schema.sql
+├── .env.example
+├── .gitignore
+├── netlify.toml
 └── README.md
 ```
 
----
+## Configurar Supabase
 
-## 🌐 Hospedando no Netlify
+1. Crie um projeto no Supabase.
+2. No SQL Editor, execute o arquivo `supabase/schema.sql`.
+3. Em Authentication, crie os usuarios da equipe.
+4. Para cada usuario criado em `auth.users`, insira um perfil na tabela `public.users`.
 
-1. Acesse https://netlify.com
-2. Faça login.
-3. Clique em **Add new site**.
-4. Selecione **Deploy manually**.
-5. Arraste a pasta do projeto.
-6. Aguarde alguns segundos.
-7. O Netlify irá gerar um link público para compartilhar com a equipe.
+Exemplo de usuario admin:
 
----
+```sql
+insert into public.users (id, full_name, email, role)
+values ('UUID_DO_AUTH_USER', 'Gestao DentalMed', 'admin@dentalmed.com.br', 'admin');
+```
 
-## 📱 Compatibilidade
+Exemplo de responsavel de unidade:
 
-- Google Chrome
-- Microsoft Edge
-- Safari
-- Firefox
-- Android
-- iPhone (Safari)
+```sql
+insert into public.users (id, full_name, email, role, unit_id)
+select
+  'UUID_DO_AUTH_USER',
+  'Responsavel Recife',
+  'recife@dentalmed.com.br',
+  'responsible',
+  id
+from public.units
+where city = 'Recife';
+```
 
----
+## Configurar o app
 
-## 🔒 Observações
+Edite `dentalmed_app/config.js` com as credenciais do seu projeto Supabase. `config.example.js` fica como referencia:
 
-Este aplicativo não utiliza banco de dados externo.
-As marcações e observações são armazenadas localmente no navegador do usuário através do LocalStorage.
+```js
+window.DENTALMED_CONFIG = {
+  SUPABASE_URL: 'https://seu-projeto.supabase.co',
+  SUPABASE_ANON_KEY: 'sua-chave-anon-publica',
+  GOOGLE_SHEETS_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/SEU_ID/pub?output=csv'
+};
+```
 
----
+A chave `anon` do Supabase e publica, mas deve continuar vinculada a RLS bem configurado. Em projetos com build, tambem e possivel gerar esse arquivo a partir das variaveis de `.env.example`.
 
-Desenvolvido para facilitar a rotina de produção de conteúdo da equipe DentalMed.
+## Planilha CSV
+
+Publique a planilha do Google Sheets como CSV e use colunas com estes nomes:
+
+```text
+unidade,data,horario,turno,titulo,descricao,tipo de conteudo,cta,enquete,link de referencia,responsavel,status inicial
+```
+
+Formatos aceitos:
+
+- `data`: `YYYY-MM-DD` ou `DD/MM/YYYY`
+- `status inicial`: `pending`, `in_progress`, `completed`, `not_done` ou equivalentes em portugues
+- `unidade`: nome ou cidade da unidade
+
+No app, entre como admin, abra **Sincronizar**, informe a URL CSV e clique em **Sincronizar agora**.
+
+## Deploy no Netlify
+
+O arquivo `netlify.toml` ja publica a pasta `dentalmed_app`.
+
+1. Crie um site no Netlify conectado ao GitHub.
+2. Use este repositorio como origem.
+3. O publish directory sera lido de `netlify.toml`: `dentalmed_app`.
+4. Antes do deploy de producao, preencha `dentalmed_app/config.js` com as configuracoes do projeto ou use uma etapa de build propria para gerar esse arquivo.
+
+## Desenvolvimento local
+
+Como o app e estatico, basta servir a pasta:
+
+```bash
+cd dentalmed_app
+python -m http.server 4173
+```
+
+Abra `http://127.0.0.1:4173/`.
+
+Sem `config.js`, o app abre em modo demonstracao para revisar a interface, mas os dados reais dependem do Supabase.
