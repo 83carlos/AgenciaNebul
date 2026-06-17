@@ -55,6 +55,8 @@ function normalizeSheetCsvUrl(value) {
   const match = url.match(/docs\.google\.com\/spreadsheets\/d\/([^/]+)/);
   if (!match) return url;
   const gid = url.match(/[?&]gid=(\d+)/)?.[1] || '0';
+  if (url.includes('/gviz/tq')) return url;
+  if (!url.includes('/d/e/')) return `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv`;
   return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
 }
 

@@ -77,7 +77,7 @@ Edite `dentalmed_app/config.js` com as credenciais do seu projeto Supabase. `con
 window.DENTALMED_CONFIG = {
   SUPABASE_URL: 'https://seu-projeto.supabase.co',
   SUPABASE_ANON_KEY: 'sua-chave-anon-publica',
-  GOOGLE_SHEETS_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/SEU_ID/pub?output=csv'
+  GOOGLE_SHEETS_CSV_URL: 'https://docs.google.com/spreadsheets/d/SEU_ID/gviz/tq?tqx=out:csv'
 };
 ```
 
@@ -106,6 +106,12 @@ Um modelo pronto esta em `docs/google-sheets-template.csv`. Para usar:
 3. Acesse **Arquivo > Compartilhar > Publicar na Web**.
 4. Escolha a aba da planilha e o formato **CSV**.
 5. Copie a URL publicada e use no campo `GOOGLE_SHEETS_CSV_URL` em `dentalmed_app/config.js`.
+
+Se a planilha estiver compartilhada para leitura, tambem e possivel usar:
+
+```text
+https://docs.google.com/spreadsheets/d/ID_DA_PLANILHA/gviz/tq?tqx=out:csv
+```
 
 Tambem e possivel colar um link comum de edicao/compartilhamento do Google Sheets. O app converte links no formato `/edit` para `/export?format=csv&gid=0`, mas a planilha precisa permitir leitura publica ou estar publicada na Web.
 
